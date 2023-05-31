@@ -17,8 +17,6 @@ const maxTitleLen = 100
 const maxDescLen = 5000
 
 const timeout = 60000
-const height = 900
-const width = 900
 
 let browser: Browser, page: Page
 let cookiesDirPath: string
@@ -1065,7 +1063,7 @@ async function launchBrowser(
         }
     }
 
-    await page.setViewport({ width: width, height: height })
+    // await page.setViewport({ width: width, height: height })
     await page.setBypassCSP(true)
 }
 
