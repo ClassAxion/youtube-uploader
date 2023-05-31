@@ -8,7 +8,7 @@ export interface Video {
     function?: any
     thumbnail?: string
     publishType?: 'PRIVATE' | 'UNLISTED' | 'PUBLIC'
-    onSuccess?: (url: string) => void
+    onSuccess?: (url: string | null) => void
     skipProcessingWait?: boolean
     onProgress?: (arg0: VideoProgress) => void
     channelName?: string
@@ -17,7 +17,7 @@ export interface Video {
     isNotForKid?: boolean
     isChannelMonetized?: boolean
     gameTitleSearch?: string
-    gameSelector?: ( arg0: GameData ) => Promise<boolean> | null
+    gameSelector?: (arg0: GameData) => Promise<boolean> | null
 }
 
 export interface MessageTransport {
@@ -53,7 +53,7 @@ export interface VideoToEdit {
     isAgeRestriction?: boolean
     isNotForKid?: boolean
     gameTitleSearch?: string
-    gameSelector?: ( arg0: GameData ) => Promise<boolean> | null
+    gameSelector?: (arg0: GameData) => Promise<boolean> | null
 }
 
 export interface Comment {
