@@ -8,7 +8,7 @@ import {
     MessageTransport,
     GameData
 } from './types'
-import { plugin as puppeteer } from 'puppeteer-with-fingerprints'
+import { plugin } from 'puppeteer-with-fingerprints'
 import { PuppeteerNodeLaunchOptions, Browser, Page, ElementHandle } from 'puppeteer-core'
 import fs from 'fs-extra'
 import path from 'path'
@@ -1039,11 +1039,23 @@ async function launchBrowser(
     fingerprint: string = '',
     proxy: string = ''
 ) {
-    //@ts-ignore
-    browser = await puppeteer.launch(puppeteerLaunch)
+    let p = plugin
 
-    if (!!fingerprint) puppeteer.useFingerprint(fingerprint)
-    if (!!proxy) puppeteer.useProxy(proxy)
+    if (!!fingerprint) p = p.useFingerprint(fingerprint)
+    if (!!proxy) p = p.useProxy(proxy)
+
+    const f = JSON.parse(fingerprint)
+
+    const width = f['screen.availWidth']
+    const height = f['screen.availHeight']
+
+    if (!puppeteerLaunch) puppeteerLaunch = {}
+    if (!puppeteerLaunch.args) puppeteerLaunch.args = []
+
+    puppeteerLaunch.args.push(`--window-size=${width},${height}`)
+
+    //@ts-ignore
+    browser = await p.launch(puppeteerLaunch)
 
     page = await browser.newPage()
     await page.setDefaultTimeout(timeout)
