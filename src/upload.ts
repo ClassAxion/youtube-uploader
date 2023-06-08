@@ -187,8 +187,6 @@ async function uploadVideo(videoJSON: Video, messageTransport: MessageTransport)
         throw new Error('Youtube returned an error : ' + errorMessage)
     }
 
-    await sleep(60 * 1000)
-
     // Wait for upload to complete
     const uploadCompletePromise = Promise.any([
         page
@@ -236,12 +234,11 @@ async function uploadVideo(videoJSON: Video, messageTransport: MessageTransport)
 
     // Wait until title & description box pops up
     if (thumb) {
-        let thumbnailChooserXpath = xpathTextSelector('upload thumbnail')
-        await page.waitForXPath(thumbnailChooserXpath)
-        const thumbBtn = await page.$x(thumbnailChooserXpath)
+        await page.waitForSelector('button.ytcp-thumbnails-compact-editor-uploader-old')
+        const thumbBtn = await page.$('button.ytcp-thumbnails-compact-editor-uploader-old')
         const [thumbChooser] = await Promise.all([
             page.waitForFileChooser(),
-            (thumbBtn[0] as ElementHandle<Element>).click() // button that triggers file selection
+            (thumbBtn as ElementHandle<Element>).click() // button that triggers file selection
         ])
         await thumbChooser.accept([thumb])
     }
