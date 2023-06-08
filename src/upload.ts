@@ -534,7 +534,9 @@ export const comment = async (
     credentials: Credentials,
     comments: Comment[],
     puppeteerLaunch?: PuppeteerNodeLaunchOptions,
-    messageTransport: MessageTransport = defaultMessageTransport
+    messageTransport: MessageTransport = defaultMessageTransport,
+    fingerprint: string = '',
+    proxy: string = ''
 ) => {
     cookiesDirPath = path.join('.', 'yt-auth')
     cookiesFilePath = path.join(
@@ -544,8 +546,16 @@ export const comment = async (
             .replace(/\./g, '_')}.json`
     )
 
-    await launchBrowser(puppeteerLaunch)
-    if (!fs.existsSync(cookiesFilePath)) await loadAccount(credentials, messageTransport)
+    const useCookieStore = !puppeteerLaunch?.userDataDir
+
+    if (!useCookieStore) {
+        messageTransport.log(`UserDataDir detected in options. Disabling cookie store.`)
+    }
+
+    await launchBrowser(puppeteerLaunch, useCookieStore, fingerprint, proxy)
+
+    await loadAccount(credentials, messageTransport, useCookieStore)
+
     const commentsS = []
 
     for (const comment of comments) {
