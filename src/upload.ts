@@ -190,11 +190,21 @@ async function uploadVideo(videoJSON: Video, messageTransport: MessageTransport)
     await sleep(60 * 1000)
 
     // Wait for upload to complete
-    const uploadCompletePromise = page
-        .waitForXPath('//tp-yt-paper-progress[contains(@class,"ytcp-video-upload-progress-hover") and @value="100"]', {
-            timeout: 5 * 60 * 1000
-        })
-        .then(() => 'uploadComplete')
+    const uploadCompletePromise = Promise.any([
+        page
+            .waitForXPath(
+                '//tp-yt-paper-progress[contains(@class,"ytcp-video-upload-progress-hover") and @value="100"]',
+                {
+                    timeout: 5 * 60 * 1000
+                }
+            )
+            .then(() => 'uploadComplete'),
+        page
+            .waitForSelector('#processing-tooltip ytcp-video-upload-progress-hover .ytcp-video-upload-progress-hover', {
+                timeout: 5 * 60 * 1000
+            })
+            .then(() => 'uploadComplete')
+    ])
 
     // Check if daily upload limit is reached
     const dailyUploadPromise = page
