@@ -187,6 +187,8 @@ async function uploadVideo(videoJSON: Video, messageTransport: MessageTransport)
         throw new Error('Youtube returned an error : ' + errorMessage)
     }
 
+    await sleep(60 * 1000)
+
     // Wait for upload to complete
     const uploadCompletePromise = page
         .waitForXPath('//tp-yt-paper-progress[contains(@class,"ytcp-video-upload-progress-hover") and @value="100"]', {
