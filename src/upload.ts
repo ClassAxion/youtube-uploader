@@ -198,7 +198,7 @@ async function uploadVideo(videoJSON: Video, messageTransport: MessageTransport)
             )
             .then(() => 'uploadComplete'),
         page
-            .waitForSelector('#processing-tooltip ytcp-video-upload-progress-hover .ytcp-video-upload-progress-hover', {
+            .waitForXPath('//div[contains(text(),"Video upload complete")]', {
                 timeout: 5 * 60 * 1000
             })
             .then(() => 'uploadComplete')
