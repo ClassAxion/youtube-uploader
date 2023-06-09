@@ -609,6 +609,14 @@ const publishComment = (comment: Comment) => {
 
                 await page.evaluate(() =>
                     (
+                        document.querySelectorAll('#action-menu button#button[aria-label]')[0] as HTMLButtonElement
+                    ).click()
+                )
+
+                await sleep(2500)
+
+                await page.evaluate(() =>
+                    (
                         document.querySelector(
                             '#items .iron-selected a.ytd-menu-navigation-item-renderer'
                         ) as HTMLButtonElement
