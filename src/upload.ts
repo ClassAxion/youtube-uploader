@@ -16,7 +16,7 @@ import path from 'path'
 const maxTitleLen = 100
 const maxDescLen = 5000
 
-const timeout = 60000
+const timeout = 180000
 
 let browser: Browser, page: Page
 let cookiesDirPath: string
