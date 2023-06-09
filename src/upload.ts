@@ -122,14 +122,18 @@ async function uploadVideo(videoJSON: Video, messageTransport: MessageTransport)
     const saveCloseBtnXPath = '//*[@aria-label="Save and close"]/tp-yt-iron-icon'
     const createBtnXPath = '//*[@id="create-icon"]/tp-yt-iron-icon'
     const addVideoBtnXPath = '//*[@id="text-item-0"]/ytcp-ve/div/div/yt-formatted-string'
-    if (await page.waitForXPath(createBtnXPath, { timeout: 5000 }).catch(() => null)) {
-        const createBtn = await page.$x(createBtnXPath)
-        await (createBtn[0] as ElementHandle<Element>).click()
-    }
-    if (await page.waitForXPath(addVideoBtnXPath, { timeout: 5000 }).catch(() => null)) {
-        const addVideoBtn = await page.$x(addVideoBtnXPath)
-        await (addVideoBtn[0] as ElementHandle<Element>).click()
-    }
+
+    try {
+        if (await page.waitForXPath(createBtnXPath, { timeout: 5000 }).catch(() => null)) {
+            const createBtn = await page.$x(createBtnXPath)
+            await (createBtn[0] as ElementHandle<Element>).click()
+        }
+        if (await page.waitForXPath(addVideoBtnXPath, { timeout: 5000 }).catch(() => null)) {
+            const addVideoBtn = await page.$x(addVideoBtnXPath)
+            await (addVideoBtn[0] as ElementHandle<Element>).click()
+        }
+    } catch {}
+
     for (let i = 0; i < 2; i++) {
         try {
             await page.waitForXPath(selectBtnXPath)
@@ -624,6 +628,8 @@ const publishComment = (comment: Comment) => {
                 )
 
                 await page.waitForSelector('#confirm-button button.yt-spec-button-shape-next')
+
+                await sleep(2500)
 
                 await page.evaluate(() =>
                     (
