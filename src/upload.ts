@@ -572,6 +572,7 @@ export const comment = async (
     for (const comment of comments) {
         let result
         if (comment.live) result = await publishLiveComment(comment, messageTransport)
+        else if (comment.link.includes('/shorts/')) await publishShortsComment(comment)
         else result = await publishComment(comment)
 
         const { onSuccess } = comment
@@ -605,6 +606,69 @@ const publishComment = (comment: Comment) => {
             await commentBox[0].type(cmt.substring(0, 10000))
 
             await page.click('#submit-button')
+
+            await page.waitForSelector('#comment')
+
+            if (comment.pin) {
+                await sleep(2500)
+
+                await page.evaluate(() =>
+                    (
+                        document.querySelectorAll('#action-menu button#button[aria-label]')[0] as HTMLButtonElement
+                    ).click()
+                )
+
+                await sleep(2500)
+
+                await page.evaluate(() =>
+                    (
+                        document.querySelector(
+                            '#items .iron-selected a.ytd-menu-navigation-item-renderer'
+                        ) as HTMLButtonElement
+                    ).click()
+                )
+
+                await page.waitForSelector('#confirm-button button.yt-spec-button-shape-next')
+
+                await sleep(2500)
+
+                await page.evaluate(() =>
+                    (
+                        document.querySelector('#confirm-button button.yt-spec-button-shape-next') as HTMLButtonElement
+                    ).click()
+                )
+
+                await sleep(2500)
+            }
+
+            resolve({ err: false, data: 'success' })
+        } catch (err) {
+            resolve({ err: true, data: err })
+        }
+    })
+}
+
+const publishShortsComment = (comment: Comment) => {
+    const videoUrl = comment.link
+    if (!videoUrl) {
+        throw new Error('The link of the  video is a required parameter')
+    }
+    return new Promise(async (resolve) => {
+        try {
+            const cmt = comment.comment
+            await page.goto(videoUrl)
+            await sleep(2000)
+
+            await page.waitForSelector('button[aria-label="View comments"]')
+            await page.click('button[aria-label="View comments"]')
+
+            await page.focus(`#simple-box`)
+            const commentBox = await page.$x('div#simple-box')
+            await commentBox[0].focus()
+            await (commentBox[0] as ElementHandle<Element>).click()
+            await commentBox[0].type(cmt.substring(0, 10000))
+
+            await page.click('button[aria-label="Comment"]')
 
             await page.waitForSelector('#comment')
 
