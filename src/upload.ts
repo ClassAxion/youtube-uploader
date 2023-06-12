@@ -665,7 +665,7 @@ const publishShortsComment = (comment: Comment) => {
             await sleep(2000)
 
             await page.focus(`#placeholder-area`)
-            const commentBox = await page.$x('#placeholder-area')
+            const commentBox = await page.$x('//*[@id="placeholder-area"]')
             await commentBox[0].focus()
             await (commentBox[0] as ElementHandle<Element>).click()
             await commentBox[0].type(cmt.substring(0, 10000))
