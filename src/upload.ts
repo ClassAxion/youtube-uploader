@@ -572,7 +572,7 @@ export const comment = async (
     for (const comment of comments) {
         let result
         if (comment.live) result = await publishLiveComment(comment, messageTransport)
-        else if (comment.link.includes('/shorts/')) await publishShortsComment(comment)
+        else if (comment.link.includes('/shorts/')) result = await publishShortsComment(comment)
         else result = await publishComment(comment)
 
         const { onSuccess } = comment
