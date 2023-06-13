@@ -191,8 +191,22 @@ async function uploadVideo(videoJSON: Video, messageTransport: MessageTransport)
         throw new Error('Youtube returned an error : ' + errorMessage)
     }
 
+    let isDailyLimit = false
+
+    try {
+        await page.waitForXPath('//div[contains(text(),"Daily upload limit reached")]', { timeout: 15 * 1000 })
+
+        isDailyLimit = true
+    } catch {}
+
+    if (isDailyLimit) {
+        browser.close()
+
+        throw new Error('Daily upload limit reached')
+    }
+
     // Wait for upload to complete
-    const uploadCompletePromise = Promise.any([
+    await Promise.any([
         page
             .waitForXPath(
                 '//tp-yt-paper-progress[contains(@class,"ytcp-video-upload-progress-hover") and @value="100"]',
@@ -207,16 +221,6 @@ async function uploadVideo(videoJSON: Video, messageTransport: MessageTransport)
             })
             .then(() => 'uploadComplete')
     ])
-
-    // Check if daily upload limit is reached
-    const dailyUploadPromise = page
-        .waitForXPath('//div[contains(text(),"Daily upload limit reached")]', { timeout: 5 * 60 * 1000 })
-        .then(() => 'dailyUploadReached')
-    const uploadResult = await Promise.any([uploadCompletePromise, dailyUploadPromise])
-    if (uploadResult === 'dailyUploadReached') {
-        browser.close()
-        throw new Error('Daily upload limit reached')
-    }
 
     // Wait for upload to go away and processing to start, skip the wait if the user doesn't want it.
     if (!videoJSON.skipProcessingWait) {
